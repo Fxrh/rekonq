@@ -86,7 +86,7 @@ UrlBar::UrlBar(QWidget *parent)
     setStyleSheet(QString("UrlBar { padding: 0 0 0 %1px;} ").arg(_icon->sizeHint().width()));
 
     // doesn't show the clear button
-    setClearButtonShown(false);
+    setClearButtonShown(true);
 
     // insert decoded URLs
     setUrlDropsEnabled(true);
@@ -462,9 +462,10 @@ IconButton *UrlBar::addRightIcon(UrlBar::icon ic)
     }
 
     _rightIconsList << rightIcon;
+    int clearIconSize = 20;
     int iconsCount = _rightIconsList.count();
     int iconHeight = (height() - 18) / 2;
-    rightIcon->move(width() - 23*iconsCount, iconHeight);
+    rightIcon->move(width() - 23*iconsCount - clearIconSize, iconHeight);
     rightIcon->show();
 
     return rightIcon;

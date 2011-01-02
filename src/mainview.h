@@ -184,6 +184,8 @@ private:
 
     // the new tab button
     QToolButton *m_addTabButton;
+    QToolButton *m_showTabsButton;
+    QWidget *m_cornerWidget;
 
     int m_currentTabIndex;
 

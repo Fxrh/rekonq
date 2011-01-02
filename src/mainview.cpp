@@ -55,6 +55,7 @@
 #include <QtGui/QLabel>
 #include <QtGui/QMovie>
 #include <QtGui/QToolButton>
+#include <QtGui/QHBoxLayout>
 
 
 MainView::MainView(MainWindow *parent)
@@ -67,6 +68,14 @@ MainView::MainView(MainWindow *parent)
     // setting tabbar
     TabBar *tabBar = new TabBar(this);
     m_addTabButton = new QToolButton(this);
+    m_showTabsButton = new QToolButton(this);
+    m_cornerWidget = new QWidget(this);
+
+    QHBoxLayout *cornerLayout = new QHBoxLayout();
+    cornerLayout->addWidget(m_showTabsButton);
+    cornerLayout->addStretch();
+    m_cornerWidget->setLayout(cornerLayout);
+
     setTabBar(tabBar);
 
     // set mouse tracking for tab previews
@@ -115,40 +124,48 @@ void MainView::postLaunch()
     connect(this, SIGNAL(currentChanged(int)), Application::sessionManager(), SLOT(saveSession()));
 
     m_addTabButton->setDefaultAction(m_parentWindow->actionByName("new_tab"));
-
     m_addTabButton->setAutoRaise(true);
     m_addTabButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
+    m_showTabsButton->setDefaultAction(m_parentWindow->actionByName("tab_list"));
+    m_showTabsButton->setPopupMode(QToolButton::InstantPopup);
+    m_showTabsButton->setAutoRaise(true);
+    m_showTabsButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
+    m_cornerWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    setCornerWidget(m_cornerWidget);
 }
 
 
 void MainView::updateTabButtonPosition()
 {
-    static bool ButtonInCorner = false;
+    static bool NewTabButtonInCorner = false;
 
     int tabWidgetWidth = frameSize().width();
     int tabBarWidth = tabBar()->tabSizeHint(0).width() * tabBar()->count();
 
-    if (tabBarWidth + m_addTabButton->width() > tabWidgetWidth)
+    if (tabBarWidth + m_addTabButton->width() + m_showTabsButton->width() > tabWidgetWidth)
     {
-        if (ButtonInCorner)
+        if (NewTabButtonInCorner)
             return;
-        setCornerWidget(m_addTabButton);
-        ButtonInCorner = true;
+        static_cast<QHBoxLayout*>(m_cornerWidget->layout())->insertWidget(0, m_addTabButton);
+        NewTabButtonInCorner = true;
     }
     else
     {
-        if (ButtonInCorner)
+        if (NewTabButtonInCorner)
         {
-            setCornerWidget(0);
+            m_cornerWidget->layout()->removeWidget(m_addTabButton);
+            m_addTabButton->setParent(this);
             m_addTabButton->show();
-            ButtonInCorner = false;
+            NewTabButtonInCorner = false;
         }
 
         // detecting X position
         int newPosX = tabBarWidth;
         int tabWidthHint = tabBar()->tabSizeHint(0).width();
         if (tabWidthHint < sizeHint().width() / 4)
-            newPosX = tabWidgetWidth - m_addTabButton->width();
+            newPosX = tabWidgetWidth - m_addTabButton->width() - m_showTabsButton->width();
 
         m_addTabButton->move(newPosX, 0);
     }

@@ -40,6 +40,7 @@
 
 // Forward Declarations
 class WebPage;
+class KMenu;
 
 
 class REKONQ_TESTS_EXPORT WebView : public KWebView
@@ -82,6 +83,8 @@ private slots:
 
     void stopScrolling();
 
+    void changeAutoReload(QAction *action);
+
 signals:
     void loadUrl(const KUrl &, const Rekonq::OpenType &);
     void zoomChanged(int);
@@ -106,6 +109,10 @@ private:
     bool m_smoothScrolling;
     int m_dy;
     int m_smoothScrollSteps;
+
+    // Auto Reload Menu
+    KMenu *m_autoReloadMenu;
+    QTimer *m_autoReloadTimer;
 };
 
 #endif

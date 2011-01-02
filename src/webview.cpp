@@ -76,6 +76,8 @@ WebView::WebView(QWidget* parent)
         , m_smoothScrolling(false)
         , m_dy(0)
         , m_smoothScrollSteps(0)
+        , m_autoReloadMenu(0)
+        , m_autoReloadTimer(0)
 {
     WebPage *page = new WebPage(this);
     setPage(page);
@@ -348,6 +350,55 @@ void WebView::contextMenuEvent(QContextMenuEvent *event)
 
             menu.addAction(frameMenu);
 
+            menu.addSeparator();
+
+            // auto reload actions
+            if( !m_autoReloadMenu )
+            {
+                m_autoReloadMenu = new KMenu(i18n("Auto Reload"), this);
+                QActionGroup *actionGroup = new QActionGroup(this);
+                actionGroup->setExclusive(true);
+                QAction *action = actionGroup->addAction(i18n("No Reload"));
+                action->setData(0);
+                action->setCheckable(true);
+                action->setChecked(true);
+                m_autoReloadMenu->addAction(action);
+                action = actionGroup->addAction(i18n("5 Seconds"));
+                action->setData(5);
+                action->setCheckable(true);
+                m_autoReloadMenu->addAction(action);
+                action = actionGroup->addAction(i18n("15 Seconds"));
+                action->setData(15);
+                action->setCheckable(true);
+                m_autoReloadMenu->addAction(action);
+                action = actionGroup->addAction(i18n("30 Seconds"));
+                action->setData(30);
+                action->setCheckable(true);
+                m_autoReloadMenu->addAction(action);
+                action = actionGroup->addAction(i18n("1 Minute"));
+                action->setData(60);
+                action->setCheckable(true);
+                m_autoReloadMenu->addAction(action);
+                action = actionGroup->addAction(i18n("2 Minutes"));
+                action->setData(120);
+                action->setCheckable(true);
+                m_autoReloadMenu->addAction(action);
+                action = actionGroup->addAction(i18n("5 Minutes"));
+                action->setData(300);
+                action->setCheckable(true);
+                m_autoReloadMenu->addAction(action);
+                action = actionGroup->addAction(i18n("15 Minutes"));
+                action->setData(15*60);
+                action->setCheckable(true);
+                m_autoReloadMenu->addAction(action);
+                action = actionGroup->addAction(i18n("30 Minutes"));
+                action->setData(30*60);
+                action->setCheckable(true);
+                m_autoReloadMenu->addAction(action);
+
+                connect( actionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeAutoReload(QAction*)) );
+            }
+            menu.addMenu(m_autoReloadMenu);
             menu.addSeparator();
 
             // Page Actions
@@ -788,3 +839,18 @@ void WebView::stopScrolling()
     m_dy = 0;
     m_smoothScrolling = false;
 }
+
+void WebView::changeAutoReload( QAction *action )
+{
+    if( !m_autoReloadTimer )
+    {
+        if( action->data() == 0 )
+            return;
+        m_autoReloadTimer = new QTimer(this);
+        connect( m_autoReloadTimer, SIGNAL(timeout()), this, SLOT(reload()) );
+    }
+    m_autoReloadTimer->stop();
+    if( action->data() != 0 )
+        m_autoReloadTimer->start(action->data().toInt() * 1000);
+}
+

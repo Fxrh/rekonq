@@ -163,11 +163,12 @@ void MainView::updateTabButtonPosition()
 
         // detecting X position
         int newPosX = tabBarWidth;
+        int newPosY = m_cornerWidget->pos().y() + m_cornerWidget->height() - m_addTabButton->sizeHint().height();
         int tabWidthHint = tabBar()->tabSizeHint(0).width();
         if (tabWidthHint < sizeHint().width() / 4)
             newPosX = tabWidgetWidth - m_addTabButton->width() - m_showTabsButton->width();
 
-        m_addTabButton->move(newPosX, 0);
+        m_addTabButton->move(newPosX, newPosY);
     }
 }
 

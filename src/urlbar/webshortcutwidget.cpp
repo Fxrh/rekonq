@@ -117,6 +117,15 @@ void WebShortcutWidget::show(const KUrl &url, const QString &openSearchName, con
 {
     m_wsLineEdit->clear();
     m_nameLineEdit->setText(openSearchName);
+
+    QString keys;
+    Q_FOREACH(KService::Ptr provider, m_providers)
+    {
+        if( provider->property("Name").toString() == openSearchName )
+            keys = provider->property("Keys").toStringList().join(",");
+    }
+
+    m_wsLineEdit->setText(keys);
     m_url = url;
     showAt(pos);
 }
@@ -159,7 +168,7 @@ void WebShortcutWidget::shortcutsChanged(const QString& newShorthands)
         }
     }
 
-    if (!contenderName.isEmpty())
+    if (!contenderName.isEmpty() && contenderName != m_nameLineEdit->text())
     {
         m_okButton->setEnabled(false);
         m_noteLabel->setText(i18n("The shortcut \"%1\" is already assigned to \"%2\".", contenderWS, contenderName));

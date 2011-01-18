@@ -109,6 +109,8 @@ public Q_SLOTS:
     void updateHighlight();
     void findSelectedText();
 
+    void settingsChanged();
+
 Q_SIGNALS:
     // switching tabs
     void ctrlTabPressed();
@@ -194,6 +196,7 @@ private:
     QTimer *m_hidePopup;
 
     KActionMenu *m_toolsMenu;
+    KActionMenu *m_developerMenu;
 };
 
 #endif // MAINWINDOW_H

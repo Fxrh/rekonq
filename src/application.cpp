@@ -452,6 +452,7 @@ void Application::updateConfiguration()
     bool b = ReKonfig::closeTabSelectPrevious();
     Q_FOREACH(const QWeakPointer<MainWindow> &w, m_mainWindows)
     {
+        w.data()->settingsChanged();
         MainView *mv = w.data()->mainView();
         mv->updateTabBar();
 

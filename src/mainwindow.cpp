@@ -106,6 +106,7 @@ MainWindow::MainWindow()
         , m_popup(new KPassivePopup(this))
         , m_hidePopup(new QTimer(this))
         , m_toolsMenu(0)
+        , m_developerMenu(0)
 {
     // creating a centralWidget containing panel, m_view and the hidden findbar
     QWidget *centralWidget = new QWidget;
@@ -256,11 +257,16 @@ void MainWindow::initToolsMenu()
 
     m_toolsMenu->addSeparator();
 
-    KActionMenu *webMenu = new KActionMenu(KIcon("applications-development-web"), i18n("Development"), this);
-    webMenu->addAction(actionByName(QL1S("web_inspector")));
-    webMenu->addAction(actionByName(QL1S("page_source")));
-    webMenu->addAction(actionByName(QL1S("net_analyzer")));
-    m_toolsMenu->addAction(webMenu);
+    if(!m_developerMenu)
+    {
+        m_developerMenu = new KActionMenu(KIcon("applications-development-web"), i18n("Development"), this);
+        m_developerMenu->addAction(actionByName(QL1S("web_inspector")));
+        m_developerMenu->addAction(actionByName(QL1S("page_source")));
+        m_developerMenu->addAction(actionByName(QL1S("net_analyzer")));
+    }
+    m_toolsMenu->addAction(m_developerMenu);
+    if(!ReKonfig::showDeveloperTools())
+        m_developerMenu->setVisible(false);
 
     m_toolsMenu->addSeparator();
 
@@ -867,6 +873,18 @@ void MainWindow::findSelectedText()
 {
     // FindBar::setVisible() gets the selected text by itself
     m_findBar->show();
+}
+
+
+void MainWindow::settingsChanged()
+{
+    if(m_developerMenu)
+    {
+        if(ReKonfig::showDeveloperTools())
+            m_developerMenu->setVisible(true);
+        else
+            m_developerMenu->setVisible(false);
+    }
 }
 
 
